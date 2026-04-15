@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Checktask Explorer
 
-## Getting Started
+Mini app local-first de organizacao visual de tarefas inspirado em pastas e arquivos. A interface trabalha com uma arvore hierarquica de secoes e tarefas, com persistencia real no navegador, importacao/exportacao JSON, drag and drop dentro do mesmo grupo e empacotamento como app desktop Windows.
 
-First, run the development server:
+## Como rodar
+
+Desenvolvimento:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Uso local no navegador:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run build
+npm run start
+```
 
-## Learn More
+Depois abra `http://localhost:3000` no Chrome ou Chromium e use o botao `Instalar app` quando ele aparecer.
 
-To learn more about Next.js, take a look at the following resources:
+## App desktop Windows
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Para gerar o instalador desktop:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run desktop:build
+```
 
-## Deploy on Vercel
+O instalador e salvo em:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```text
+src-tauri/target/release/bundle/nsis/Checktask Explorer_0.1.0_x64-setup.exe
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Depois de executar esse instalador, o app passa a poder ser aberto como aplicativo normal do Windows, sem terminal.
+
+## Stack
+
+- Next.js 16 App Router
+- React 19 + TypeScript
+- Tailwind CSS
+- shadcn/ui como base de componentes locais
+- Zustand para estado da UI
+- Dexie + IndexedDB para persistencia local-first
+- dnd-kit para drag and drop
+- Sonner para feedbacks de acao
+- Tauri 2 para empacotamento desktop
+- PWA leve com manifest e service worker proprio
+
+## Estrutura principal
+
+```text
+src/
+  app/                         layout, manifest, icones e rotas do app
+  components/                  registro PWA e botao de instalacao
+  components/ui/               componentes shadcn locais
+  data/seed-workspace.ts       estrutura inicial de demonstracao
+  features/workspace/          store e componentes do produto
+  services/workspace-db.ts     persistencia local via IndexedDB
+  services/workspace-json.ts   importacao/exportacao e normalizacao JSON
+  types/workspace.ts           tipos da arvore e dos nos normalizados
+  utils/tree-utils.ts          operacoes puras sobre secoes e tarefas
+public/
+  icons/                       icones do PWA
+  sw.js                        service worker do modo instalavel
+scripts/                       automacao do build desktop
+src-tauri/                     casca nativa do app desktop
+```
+
+## Persistencia e JSON
+
+O workspace agora e salvo em `IndexedDB`, no banco `checktask-local-workspace`, com nos normalizados por `parentId` e `order`. Isso reduz o peso de regravar a arvore inteira a cada alteracao e deixa a base pronta para crescer depois.
+
+Na primeira abertura da nova versao, o app tenta migrar automaticamente dados legados do `localStorage`.
+
+O JSON exportado segue o formato:
+
+```json
+{
+  "version": 1,
+  "exportedAt": "2026-04-12T00:00:00.000Z",
+  "sections": []
+}
+```
+
+Cada secao pode conter `children` com outras secoes ou tarefas. IDs ausentes ou duplicados no JSON importado sao normalizados automaticamente.
