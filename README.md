@@ -1,5 +1,21 @@
 # Checktask Explorer
 
+## Status e avaliação
+
+Ferramenta local-first de portfólio, executável no navegador e empacotável para Windows. Não depende de conta ou sincronização com nuvem para o fluxo principal.
+
+**Decisões:** nós normalizados por `parentId`/`order` em IndexedDB; JSON como formato portátil de exportação e importação.
+
+Os scripts atuais oferecem lint e build; não há script de suíte automatizada de testes. Para uma avaliação manual, use um workspace descartável:
+
+1. Crie seções aninhadas e tarefas; edite e reordene os itens.
+2. Recarregue a aplicação e confira a persistência.
+3. Exporte JSON e reimporte em um perfil de navegador de teste.
+4. Confira a preservação da hierarquia e a normalização de IDs duplicados.
+5. Verifique o tratamento de JSON inválido, sem usar dados pessoais.
+
+Esses são cenários de avaliação, não uma declaração de que foram todos reexecutados nesta revisão de documentação.
+
 Mini app local-first de organizacao visual de tarefas inspirado em pastas e arquivos. A interface trabalha com uma arvore hierarquica de secoes e tarefas, com persistencia real no navegador, importacao/exportacao JSON, drag and drop dentro do mesmo grupo e empacotamento como app desktop Windows.
 
 ## Como rodar
